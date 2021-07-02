@@ -1,0 +1,17 @@
+{
+  "paths": {
+    "projects": "",
+    "ssl": "",
+    "vhost": ""
+  },
+  "template": {
+    "nossl": "<VirtualHost *:80>\n  DocumentRoot \"%v\"\n  ServerName %v.test\n  </VirtualHost>\n",
+    "ssl": "<VirtualHost *:443>\n  DocumentRoot \"%[1]v\"\n  ServerName %[2]v.test\n  SSLEngine on\n  SSLCertificateFile \"%[3]v/%[2]v.pem\"\n  SSLCertificateKeyFile \"%[3]v/%[2]v-key.pem\"\n  Protocols h2 http/1.1\n  </VirtualHost>\n"
+  },
+  "dirs": {
+    "ignore": [
+      "projects",
+      "ssl"
+    ]
+  }
+}
