@@ -4,3 +4,14 @@ Program that will read projects and create vhosts and SSL under Mac
 
 This is a small project for me to learn how Go works :)
 Code will improve when I get more indepth with the language.
+
+# Requirements
+
+### Homebrew
+```/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"```
+
+### Go - to compile if needed
+```brew install go```
+
+### mkcert - creates certificate
+```brew install mkcert```
