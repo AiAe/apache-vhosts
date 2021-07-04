@@ -2,94 +2,25 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
-	"os/exec"
+	"github.com/AiAe/apache-vhosts/src/utils"
 )
 
-var cfg Config
-var platform Platform
-
-func fetchProjects() []string {
-	var files []string
-
-	contents, err := ioutil.ReadDir(cfg.Paths.Projects)
-
-	if err != nil {
-		panic(err)
-	}
-
-	for _, f := range contents {
-		if f.IsDir() && !contains(cfg.Dirs.Ignore, f.Name()) {
-			files = append(files, f.Name())
-		}
-	}
-
-	return files
-}
-
-func createVhost(project string) {
-	path := cfg.Paths.Projects + "/" + project
-
-	if isFramework(project) {
-		path = path + "/public"
-	}
-
-	noSSL := fmt.Sprintf(cfg.Template.NoSSL, path, project)
-	saveToFile(noSSL)
-
-	if platform.Darwin {
-		createSSL(project)
-		SSL := fmt.Sprintf(cfg.Template.SSL, path, project, cfg.Paths.SSL)
-		saveToFile(SSL)
-	}
-}
-
-func createSSL(host string) {
-	keyFile := cfg.Paths.SSL + "/" + host + "-key.pem"
-	certFile := cfg.Paths.SSL + "/" + host + ".pem"
-	command := exec.Command("mkcert", "-key-file", keyFile, "-cert-file", certFile, host+".test")
-	_, err := command.Output()
-	if err != nil {
-		panic(err)
-	}
-}
-
-func restartHttpd() {
-	command := exec.Command("brew", "services", "restart", "httpd")
-	_, err := command.Output()
-	if err != nil {
-		panic(err)
-	}
-}
-
-func createLocalhost() {
-	keyFile := cfg.Paths.SSL + "/key.pem"
-	certFile := cfg.Paths.SSL + "/cert.pem"
-	command := exec.Command("mkcert", "-key-file", keyFile, "-cert-file", certFile, "localhost")
-	_, err := command.Output()
-	if err != nil {
-		panic(err)
-	}
-}
-
 func main() {
-	checkPlatform(&platform)
-	readFile(&cfg)
-	truncateFile()
+	utils.ReadFile(&utils.Cfg)
+	utils.CheckPlatform(&utils.Plt)
+	utils.TruncateFile()
 
-	if !platform.Darwin {
-		fmt.Println("This platform is not supported, creating ssl and restarting server wont work!")
-	} else {
-		createLocalhost()
+	if !utils.Plt.Darwin {
+		fmt.Println("This platform is not supported, creating ssl and restarting server are disabled!")
 	}
 
-	files := fetchProjects()
-	for _, project := range files {
+	for _, project := range utils.FetchProjects() {
 		fmt.Printf("Creating %v.test\n", project)
-		createVhost(project)
+		utils.CreateVhost(project)
 	}
 
-	if platform.Darwin {
-		restartHttpd()
+	if utils.Plt.Darwin {
+		utils.CreateSSL("localhost", "key.pem", "cert.pem")
+		utils.RunCommand("brew", []string{"services", "restart", "httpd"})
 	}
 }

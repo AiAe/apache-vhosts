@@ -1,6 +1,8 @@
-package main
+package utils
 
 import "runtime"
+
+var Plt Platform
 
 type Platform struct {
 	Windows bool
@@ -8,7 +10,7 @@ type Platform struct {
 	Darwin  bool
 }
 
-func checkPlatform(p *Platform) {
+func CheckPlatform(p *Platform) {
 	os := runtime.GOOS
 	switch os {
 	case "windows":
