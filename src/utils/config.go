@@ -43,7 +43,7 @@ func createFile() {
 	fmt.Println("Config file not found! Creating...")
 
 	if _, err := os.Stat(configPath); os.IsNotExist(err) {
-		os.MkdirAll(configPath, 0700) // Create your file
+		os.MkdirAll(configPath, 0700)
 	}
 
 	_, err := os.OpenFile(configPath+"/config.json", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
